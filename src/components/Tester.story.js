@@ -9,4 +9,4 @@ storiesOf('Tester', module)
   ))
   .add('with some emoji', () => (
     <Tester onClick={action('clicked')}><span role="img" aria-label="so cool">😀 😎 👍 💯</span></Tester>
-  ));  
+  ));
