@@ -74,7 +74,7 @@ class TimelineToolbar extends Component {
       <Toolbar>
         <div>
           <TabsContainer onTabChange={this.onTabChange}>
-            <Tabs>
+            <Tabs tabId="tool">
               {Tools}
             </Tabs>
           </TabsContainer>

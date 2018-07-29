@@ -51,12 +51,12 @@ class Track extends Component {
     currentTool: TOOLS.DELETE
   }
 
-  barWidth = 140;
 
   constructor(props) {
     super(props);
     this.state = {
-      markers: []
+      markers: [],
+      barWidth: 140
     }
   }
 
@@ -65,25 +65,29 @@ class Track extends Component {
     this.setBarWidth();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     //this.setMarkers();
-    this.setBarWidth();
+    if(prevProps.scale !== this.props.scale) {
+      this.setBarWidth();
+    }
+
   }
 
   render() {
 
     const { bars, currentTool } = this.props;
+    const { barWidth } = this.state;
 
     const Bars = new Array(bars).fill().map((bar, index) => {
       return (
-        <Bar key={index} width={this.barWidth} onClick={(e) => this.barClicked(index)}></Bar>
+        <Bar key={index} width={barWidth} onClick={(e) => this.barClicked(index)}></Bar>
       )
     });
 
     const PositionedMarkers = this.state.markers.map((marker) => {
       return (
         <PositionedMarker
-          barWidth={this.barWidth}
+          barWidth={barWidth}
           bar={marker.bar}
           currentTool={currentTool}
           key={marker.id}
@@ -95,7 +99,7 @@ class Track extends Component {
 
     return (
       <TrackWrapper>
-        <TrackElement width={this.barWidth * bars}>
+        <TrackElement width={barWidth * bars}>
           {Bars}
         </TrackElement>
         {PositionedMarkers}
@@ -104,7 +108,9 @@ class Track extends Component {
   }
 
   setBarWidth = () => {
-    this.barWidth = this.props.tempo * this.props.scale;
+    this.setState({
+      barWidth: this.props.tempo * this.props.scale
+    })
   }
 
   barClicked = (bar) => {

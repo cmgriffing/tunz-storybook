@@ -13,6 +13,34 @@ const TimelineElement = styled.div`
   min-height: 400px;
 `;
 
+const TimelineElementWrapper = styled.div`
+  width: calc(100% - 300px);
+  overflow: scroll;
+`;
+
+const TimelineToolbarWrapper = styled.div`
+
+`;
+
+const TrackHeader = styled.div`
+  height: 100px;
+`;
+
+const TrackName = styled.h3`
+
+`;
+
+const TimelineHeader = styled.div`
+  width: 300px;
+  flex-grow: 1;
+`;
+
+const TimelineWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+`;
+
 class Timeline extends Component {
 
   static propTypes = {
@@ -51,18 +79,32 @@ class Timeline extends Component {
           currentTool={currentTool}
         ></Track>
       )
-    })
+    });
+
+    console.log('song.tracks:', song.tracks);
+    const TrackHeaders = song.tracks.map((track, index) => {
+      return (
+        <TrackHeader key={index}>
+          <h3>Unititled Track {index + 1}</h3>
+        </TrackHeader>
+      )
+    });
 
     return (
-      <div>
+      <TimelineWrapper>
         <TimelineToolbar
           scaleChanged={this.scaleChanged}
           toolChanged={this.toolChanged}
         ></TimelineToolbar>
-        <TimelineElement>
-          {Tracks}
-        </TimelineElement>
-      </div>
+        <TimelineHeader>
+          {TrackHeaders}
+        </TimelineHeader>
+        <TimelineElementWrapper>
+          <TimelineElement>
+            {Tracks}
+          </TimelineElement>
+        </TimelineElementWrapper>
+      </TimelineWrapper>
     );
 
   }
