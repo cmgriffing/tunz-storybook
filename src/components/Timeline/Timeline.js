@@ -27,33 +27,44 @@ class Timeline extends Component {
       tracks: new Array(4).fill()
     }
   }
+
   constructor(props) {
     super(props);
     this.state = {
-      scale: 1.0
+      scale: 1.0,
+      currentTool: 'paint'
     };
   }
 
   render() {
 
     const { song } = this.props;
-    const { scale } = this.state;
+    const { scale, currentTool } = this.state;
 
     const Tracks = song.tracks.map((track, index) => {
       return (
-        <Track key={index} bars={song.bars} tempo={song.tempo} scale={scale} ></Track>
+        <Track
+          key={index}
+          bars={song.bars}
+          tempo={song.tempo}
+          scale={scale}
+          currentTool={currentTool}
+        ></Track>
       )
     })
 
     return (
       <div>
-        <TimelineToolbar scaleChanged={this.scaleChanged}></TimelineToolbar>
+        <TimelineToolbar
+          scaleChanged={this.scaleChanged}
+          toolChanged={this.toolChanged}
+        ></TimelineToolbar>
         <TimelineElement>
           {Tracks}
         </TimelineElement>
       </div>
     );
-    
+
   }
 
   scaleChanged = (value, event) => {
@@ -62,7 +73,14 @@ class Timeline extends Component {
       scale: value
     })
   }
-  
+
+  toolChanged = (toolName) => {
+    console.log('toolChanged', toolName);
+    this.setState({
+      currentTool: toolName
+    });
+  }
+
 }
 
 export default Timeline;

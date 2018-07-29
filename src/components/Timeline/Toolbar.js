@@ -5,6 +5,12 @@ import { Slider, FontIcon, Tab, Tabs, TabsContainer } from 'react-md';
 
 import styled from 'styled-components';
 
+export const TOOLS = {
+  PAINT: 'paint',
+  DELETE: 'delete',
+  EDIT: 'edit',
+};
+
 const Toolbar = styled.div`
   width: 100%;
   background: #AAA;
@@ -24,6 +30,7 @@ class TimelineToolbar extends Component {
   static propTypes = {
     song: PropTypes.object,
     scaleChanged: PropTypes.func,
+    toolChanged: PropTypes.func,
   };
 
   static defaultProps = {
@@ -33,25 +40,42 @@ class TimelineToolbar extends Component {
       tempo: 140,
       tracks: new Array(4).fill()
     },
-    scaleChanged: console.log
+    scaleChanged: console.log,
+    toolChanged: console.log,
   }
 
+  tools = [
+    {
+      iconName: 'format_paint',
+      name: 'paint'
+    },
+    {
+      iconName: 'layers_clear',
+      name: 'delete'
+    },
+    {
+      iconName: 'edit',
+      name: 'edit'
+    },
+  ]
+
   render() {
+
+    const Tools = this.tools.map((tool, index) => {
+      return (
+        <Tab
+          icon={<FontIcon forceSize>{tool.iconName}</FontIcon>}
+          key={index}
+        ></Tab>
+      )
+    })
 
     return (
       <Toolbar>
         <div>
-          <TabsContainer>
+          <TabsContainer onTabChange={this.onTabChange}>
             <Tabs>
-              <Tab
-                icon={<FontIcon forceSize>format_paint</FontIcon>}
-              ></Tab>
-              <Tab
-                icon={<FontIcon forceSize>layers_clear</FontIcon>}
-              ></Tab>
-              <Tab
-                icon={<FontIcon forceSize>edit</FontIcon>}
-              ></Tab>
+              {Tools}
             </Tabs>
           </TabsContainer>
         </div>
@@ -74,6 +98,10 @@ class TimelineToolbar extends Component {
 
   handleChange = (value) => {
     this.props.scaleChanged(value);
+  }
+
+  onTabChange = (newActiveTabIndex, tabId, tabControlsId, tabChildren, event) => {
+    this.props.toolChanged(this.tools[newActiveTabIndex].name);
   }
 }
 

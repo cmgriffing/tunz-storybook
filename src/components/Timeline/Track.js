@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-md';
 import styled from 'styled-components';
+import Marker from './Marker';
+import { TOOLS } from './Toolbar';
 
 const Bar = styled.div`
   flex-grow: 1;
@@ -17,6 +18,17 @@ const TrackElement = styled.div`
   height: 100px;
 `;
 
+const TrackWrapper = styled.div`
+  position: relative;
+`;
+
+const PositionedMarker = styled.div`
+  position: absolute;
+  top: 0;
+  left: ${props => props.barWidth * props.bar}px;
+  cursor: ${props => props.currentTool === TOOLS.DELETE ? 'not-allowed' : 'pointer'};
+`;
+
 class Track extends Component {
 
   static propTypes = {
@@ -24,6 +36,7 @@ class Track extends Component {
     tempo: PropTypes.number,
     track: PropTypes.object,
     scale: PropTypes.number,
+    currentTool: PropTypes.string,
   }
 
   static defaultProps = {
@@ -35,32 +48,58 @@ class Track extends Component {
       loop: '',
       markers: []
     },
+    currentTool: TOOLS.DELETE
   }
 
   barWidth = 140;
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      markers: []
+    }
+  }
+
   componentWillMount() {
+    this.setMarkers();
     this.setBarWidth();
   }
 
   componentDidUpdate() {
+    //this.setMarkers();
     this.setBarWidth();
   }
 
   render() {
 
-    const { bars } = this.props;
+    const { bars, currentTool } = this.props;
 
     const Bars = new Array(bars).fill().map((bar, index) => {
       return (
-        <Bar key={index} width={this.barWidth} onClick={this.barClicked}></Bar>
+        <Bar key={index} width={this.barWidth} onClick={(e) => this.barClicked(index)}></Bar>
+      )
+    });
+
+    const PositionedMarkers = this.state.markers.map((marker) => {
+      return (
+        <PositionedMarker
+          barWidth={this.barWidth}
+          bar={marker.bar}
+          currentTool={currentTool}
+          key={marker.id}
+        >
+          <Marker onClick={(e) => this.markerClicked(marker)} bar={marker.bar}></Marker>
+        </PositionedMarker>
       )
     });
 
     return (
-      <TrackElement width={this.barWidth * bars}>
-        {Bars}
-      </TrackElement>
+      <TrackWrapper>
+        <TrackElement width={this.barWidth * bars}>
+          {Bars}
+        </TrackElement>
+        {PositionedMarkers}
+      </TrackWrapper>
     );
   }
 
@@ -68,13 +107,52 @@ class Track extends Component {
     this.barWidth = this.props.tempo * this.props.scale;
   }
 
-  barClicked = (event) => {
-    console.log('bar clicked', event.target);
+  barClicked = (bar) => {
+    if(this.props.currentTool === TOOLS.PAINT) {
+      this.setState({
+        markers: [
+          ...this.state.markers,
+          {
+            id: bar,
+            bar: bar
+          }
+        ]
+      });
+    }
+  }
 
-    // determine action
+  markerClicked = (marker) => {
+    console.log('markerClicked', marker);
 
-    // add marker
+    switch(this.props.currentTool) {
+      case TOOLS.DELETE:
+        this.removeMarker(marker);
+        break;
 
+      default:
+        console.log('doing nothing');
+    }
+  }
+
+  removeMarker = (marker) => {
+    const index = this.state.markers.findIndex(
+      (_marker) => marker.id === _marker.id
+    );
+
+    if(index > -1) {
+      const markers = [...this.state.markers];
+      markers.splice(index, 1);
+      this.setState({
+        markers
+      });
+    }
+
+  }
+
+  setMarkers = () => {
+    this.setState({
+      markers: JSON.parse(JSON.stringify(this.props.track.markers))
+    });
   }
 }
 
