@@ -8,13 +8,22 @@ const Bar = styled.div`
   flex-grow: 1;
   border: thin solid #ccc;
   height: 100px;
+  background: ${props => {
+      const setCount = Math.floor(props.bar / 4);
+
+      if(setCount % 2 === 0) {
+        return '#777';
+      } else {
+        return '#555';
+      }
+    }
+  };
 `;
 
 const TrackElement = styled.div`
   width: ${props => props.width}px;
   flex-direction: row;
   display: flex;
-  background: #333;
   height: 100px;
 `;
 
@@ -80,7 +89,7 @@ class Track extends Component {
 
     const Bars = new Array(bars).fill().map((bar, index) => {
       return (
-        <Bar key={index} width={barWidth} onClick={(e) => this.barClicked(index)}></Bar>
+        <Bar bar={index} key={index} width={barWidth} onClick={(e) => this.barClicked(index)}></Bar>
       )
     });
 
