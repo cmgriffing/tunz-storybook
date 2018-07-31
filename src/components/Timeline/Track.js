@@ -65,7 +65,7 @@ class Track extends Component {
     super(props);
     this.state = {
       markers: [],
-      barWidth: 120
+      barWidth: 60
     }
   }
 
@@ -89,7 +89,12 @@ class Track extends Component {
 
     const Bars = new Array(bars).fill().map((bar, index) => {
       return (
-        <Bar bar={index} key={index} width={barWidth} onClick={(e) => this.barClicked(index)}></Bar>
+        <Bar
+          bar={index}
+          key={index}
+          width={barWidth}
+          onClick={(e) => this.barClicked(index)}
+        ></Bar>
       )
     });
 
@@ -101,7 +106,10 @@ class Track extends Component {
           currentTool={currentTool}
           key={marker.id}
         >
-          <Marker onClick={(e) => this.markerClicked(marker)} bar={marker.bar}></Marker>
+          <Marker
+            onClick={(e) => this.markerClicked(marker)}
+            bar={marker.bar}
+          ></Marker>
         </PositionedMarker>
       )
     });
@@ -118,7 +126,7 @@ class Track extends Component {
 
   setBarWidth = () => {
     this.setState({
-      barWidth: this.props.tempo * this.props.scale
+      barWidth: (this.props.tempo / 2) * this.props.scale
     })
   }
 
