@@ -41,7 +41,7 @@ class Track extends Component {
 
   static defaultProps = {
     bars: 4,
-    tempo: 140,
+    tempo: 120,
     scale: 1.0,
     track: {
       name: 'Untitled Track',
@@ -56,7 +56,7 @@ class Track extends Component {
     super(props);
     this.state = {
       markers: [],
-      barWidth: 140
+      barWidth: 120
     }
   }
 

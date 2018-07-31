@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import { Button } from 'react-md';
 import styled from 'styled-components';
+
 
 import Track from './Track';
 import TimelineToolbar from './Toolbar';
@@ -11,6 +12,7 @@ const TimelineElement = styled.div`
   overflow: scroll;
   background: #CCC;
   min-height: 400px;
+  position: relative;
 `;
 
 const TimelineElementWrapper = styled.div`
@@ -35,6 +37,15 @@ const TimelineHeader = styled.div`
   flex-grow: 1;
 `;
 
+const TimelineCursor = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: red;
+`;
+
 const TimelineWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -51,23 +62,25 @@ class Timeline extends Component {
     song: {
       bars: 4,
       name: 'Untitled Song',
-      tempo: 140,
+      tempo: 120,
       tracks: new Array(4).fill()
     }
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      scale: 1.0,
-      currentTool: 'paint'
-    };
+  state = {
+    scale: 1.0,
+    currentTool: 'paint',
+    isPlaying: false,
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+
   }
 
   render() {
 
     const { song } = this.props;
-    const { scale, currentTool } = this.state;
+    const { scale, currentTool, isPlaying } = this.state;
 
     const Tracks = song.tracks.map((track, index) => {
       return (
@@ -81,11 +94,11 @@ class Timeline extends Component {
       )
     });
 
-    console.log('song.tracks:', song.tracks);
     const TrackHeaders = song.tracks.map((track, index) => {
       return (
         <TrackHeader key={index}>
-          <h3>Unititled Track {index + 1}</h3>
+          <TrackName>Unititled Track {index + 1}</TrackName>
+          <Button icon>volume_off</Button>
         </TrackHeader>
       )
     });
@@ -95,6 +108,9 @@ class Timeline extends Component {
         <TimelineToolbar
           scaleChanged={this.scaleChanged}
           toolChanged={this.toolChanged}
+          isPlaying={isPlaying}
+          onPlay={this.onPlay}
+          onPause={this.onPause}
         ></TimelineToolbar>
         <TimelineHeader>
           {TrackHeaders}
@@ -102,6 +118,7 @@ class Timeline extends Component {
         <TimelineElementWrapper>
           <TimelineElement>
             {Tracks}
+            <TimelineCursor></TimelineCursor>
           </TimelineElement>
         </TimelineElementWrapper>
       </TimelineWrapper>
@@ -122,6 +139,20 @@ class Timeline extends Component {
       currentTool: toolName
     });
   }
+
+  onPlay = () => {
+    console.log('handling play at timeline level');
+    this.setState({
+      isPlaying: true
+    });
+  };
+
+  onPause = () => {
+    console.log('handling pause at timeline level');
+    this.setState({
+      isPlaying: false
+    });
+  };
 
 }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { Slider, FontIcon, Tab, Tabs, TabsContainer } from 'react-md';
+import { Button, Slider, FontIcon, Tab, Tabs, TabsContainer } from 'react-md';
 
 import styled from 'styled-components';
 
@@ -31,17 +31,33 @@ class TimelineToolbar extends Component {
     song: PropTypes.object,
     scaleChanged: PropTypes.func,
     toolChanged: PropTypes.func,
+    isPlaying: PropTypes.bool,
+    onSkipStart: PropTypes.func,
+    onRewind: PropTypes.func,
+    onStop: PropTypes.func,
+    onPlay: PropTypes.func,
+    onPause: PropTypes.func,
+    onFastForward: PropTypes.func,
+    onSkipEnd: PropTypes.func,
   };
 
   static defaultProps = {
     song: {
       bars: 4,
       name: 'Untitled Song',
-      tempo: 140,
-      tracks: new Array(4).fill()
+      tempo: 120,
+      tracks: new Array(4).fill(),
     },
     scaleChanged: console.log,
     toolChanged: console.log,
+    isPlaying: false,
+    onSkipStart: console.log,
+    onRewind: console.log,
+    onStop: console.log,
+    onPlay: console.log,
+    onPause: console.log,
+    onFastForward: console.log,
+    onSkipEnd: console.log,
   }
 
   tools = [
@@ -57,6 +73,37 @@ class TimelineToolbar extends Component {
       iconName: 'edit',
       name: 'edit'
     },
+  ];
+
+  controls = [
+    {
+      iconName: 'skip_previous',
+      name: 'skipStart',
+    },
+    {
+      iconName: 'fast_rewind',
+      name: 'rewind',
+    },
+    {
+      iconName: 'stop',
+      name: 'stop',
+    },
+    {
+      iconName: 'play_arrow',
+      name: 'play',
+    },
+    {
+      iconName: 'pause',
+      name: 'pause',
+    },
+    {
+      iconName: 'fast_forward',
+      name: 'fastForward',
+    },
+    {
+      iconName: 'skip_next',
+      name: 'skipEnd',
+    },
   ]
 
   render() {
@@ -68,16 +115,31 @@ class TimelineToolbar extends Component {
           key={index}
         ></Tab>
       )
-    })
+    });
+
+    const Controls = this.controls.map((control, index) => {
+      if(!this.props.isPlaying && control.name === 'pause') {
+        return undefined;
+      }
+      if(this.props.isPlaying && control.name === 'play') {
+        return undefined;
+      }
+      return (
+        <Button icon onClick={(e) => this.handleControlClick(control)}>{control.iconName}</Button>
+      );
+    });
 
     return (
       <Toolbar>
         <div>
-          <TabsContainer onTabChange={this.onTabChange}>
+          <TabsContainer onTabChange={this.handleToolChange}>
             <Tabs tabId="tool">
               {Tools}
             </Tabs>
           </TabsContainer>
+
+          {Controls}
+
         </div>
         <SliderWrapper>
           <Slider
@@ -89,19 +151,36 @@ class TimelineToolbar extends Component {
             min={0.1}
             step={0.1}
             max={2}
-            onChange={this.handleChange}
+            onChange={this.handleScaleChange}
           />
         </SliderWrapper>
       </Toolbar>
     );
   }
 
-  handleChange = (value) => {
+  handleScaleChange = (value) => {
     this.props.scaleChanged(value);
   }
 
-  onTabChange = (newActiveTabIndex, tabId, tabControlsId, tabChildren, event) => {
+  handleToolChange = (newActiveTabIndex, tabId, tabControlsId, tabChildren, event) => {
     this.props.toolChanged(this.tools[newActiveTabIndex].name);
+  }
+
+  handleControlClick = (control) => {
+    console.log('control', control);
+    switch(control.name) {
+      case 'play':
+        this.props.onPlay();
+        break;
+
+      case 'pause':
+        this.props.onPause();
+        break;
+
+      default:
+        console.log(`No action defined for the ${control.name} button.`);
+
+    }
   }
 }
 

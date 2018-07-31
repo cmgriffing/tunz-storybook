@@ -7,7 +7,7 @@ import Timeline from './Timeline';
 const song = {
   bars: 32,
   name: 'Untitled Song',
-  tempo: 140,
+  tempo: 120,
   tracks: new Array(4).fill()
 }
 
