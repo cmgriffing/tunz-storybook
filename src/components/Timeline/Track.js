@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import Marker from './Marker';
 import { TOOLS } from './Toolbar';
 
+import newBlip from '../../util/blip';
+
 const Bar = styled.div`
   flex-grow: 1;
   border: thin solid #ccc;
@@ -34,7 +36,8 @@ const TrackWrapper = styled.div`
 const PositionedMarker = styled.div`
   position: absolute;
   top: 0;
-  left: ${props => props.barWidth * props.bar}px;
+  left: 0;
+  transform: translateX(${props => props.barWidth * props.bar}px);
   cursor: ${props => props.currentTool === TOOLS.DELETE ? 'not-allowed' : 'pointer'};
 `;
 
@@ -46,6 +49,7 @@ class Track extends Component {
     track: PropTypes.object,
     scale: PropTypes.number,
     currentTool: PropTypes.string,
+    changed: PropTypes.func,
   }
 
   static defaultProps = {
@@ -53,39 +57,50 @@ class Track extends Component {
     tempo: 120,
     scale: 1.0,
     track: {
+      id: 1,
+      order: 1,
       name: 'Untitled Track',
-      loop: '',
+      loop: {
+        name: `Loop #1`,
+        id: 1,
+        file: 'http://localhost:5000/Eamb1e-120.wav'
+      },
       markers: []
     },
-    currentTool: TOOLS.DELETE
+    currentTool: TOOLS.DELETE,
+    changed: console.log
   }
 
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      markers: [],
-      barWidth: 60
-    }
+  state = {
+    markers: [],
+    barWidth: 60,
+    markerBars: 4,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.setMarkers();
     this.setBarWidth();
+    this.setMarkerWidth();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //this.setMarkers();
+    if(this.props.track.markers !== prevProps.track.markers) {
+      this.setMarkers();
+    }
     if(prevProps.scale !== this.props.scale) {
       this.setBarWidth();
     }
+    if(prevProps.track.loop.file !== this.props.track.loop.file) {
+      this.setMarkerWidth();
+    }
 
+    console.log('track.id', this.props.track.id);
   }
 
   render() {
 
     const { bars, currentTool } = this.props;
-    const { barWidth } = this.state;
+    const { barWidth, markerBars } = this.state;
 
     const Bars = new Array(bars).fill().map((bar, index) => {
       return (
@@ -109,6 +124,7 @@ class Track extends Component {
           <Marker
             onClick={(e) => this.markerClicked(marker)}
             bar={marker.bar}
+            width={barWidth * markerBars}
           ></Marker>
         </PositionedMarker>
       )
@@ -124,23 +140,55 @@ class Track extends Component {
     );
   }
 
+  setMarkerWidth = async () => {
+    const { bars, barWidth } = this.state;
+    const { track, tempo } = this.props;
+
+    const blip = newBlip();
+
+    await this.loadAudioSample(track.loop.file, blip);
+
+    const durationInBars = Math.round(((blip.sample('loop').duration / 60) * tempo) / 4);
+
+    this.setState({
+      markerBars: durationInBars
+    });
+
+  }
+
+  loadAudioSample(sample, blip) {
+    return new Promise((resolve, ) => {
+      blip.sampleLoader()
+          .samples({
+            'loop': sample,
+          })
+          .done(() => resolve())
+          .load();
+    })
+  }
+
   setBarWidth = () => {
     this.setState({
       barWidth: (this.props.tempo / 2) * this.props.scale
-    })
+    });
   }
 
   barClicked = (bar) => {
     if(this.props.currentTool === TOOLS.PAINT) {
+      const markers = [
+        ...this.state.markers,
+        {
+          id: bar,
+          bar: bar
+        }
+      ];
       this.setState({
-        markers: [
-          ...this.state.markers,
-          {
-            id: bar,
-            bar: bar
-          }
-        ]
+        markers
       });
+
+      const changedTrack = JSON.parse(JSON.stringify(this.props.track));
+      changedTrack.markers = markers;
+      this.props.changed(changedTrack);
     }
   }
 
@@ -168,7 +216,12 @@ class Track extends Component {
       this.setState({
         markers
       });
+
+      const changedTrack = JSON.parse(JSON.stringify(this.props.track));
+      changedTrack.markers = markers;
+      this.props.changed(changedTrack);
     }
+
 
   }
 

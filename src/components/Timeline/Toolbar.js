@@ -149,7 +149,7 @@ class TimelineToolbar extends Component {
             rightIcon={<FontIcon>zoom_in</FontIcon>}
             defaultValue={1.0}
             min={0.1}
-            step={0.1}
+            step={0.05}
             max={2}
             onChange={this.handleScaleChange}
           />
@@ -176,6 +176,10 @@ class TimelineToolbar extends Component {
       case 'pause':
         this.props.onPause();
         break;
+
+      case 'stop':
+          this.props.onStop();
+          break;
 
       default:
         console.log(`No action defined for the ${control.name} button.`);

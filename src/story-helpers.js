@@ -1,4 +1,5 @@
 import React from 'react';
+import { addDecorator } from '@storybook/react';
 
 import { ThemeProvider } from 'styled-components';
 import theme from './theme';
@@ -13,6 +14,8 @@ export const ThemeProviderDecorator = (storyFn) => {
   );
 };
 
+addDecorator(ThemeProviderDecorator);
+
 
 export const WebFontDecorator = (storyFn) => {
 
@@ -24,3 +27,5 @@ export const WebFontDecorator = (storyFn) => {
 
   return storyFn();
 }
+
+addDecorator(WebFontDecorator);
