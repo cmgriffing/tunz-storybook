@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import Track from './Track';
 import TimelineToolbar from './Toolbar';
+import TrackHeader from './TrackHeader';
 
 import BPMTimeline from '../../util/bpm-timeline';
 import { stringify } from '../../../node_modules/postcss';
@@ -24,14 +25,6 @@ const TimelineElementWrapper = styled.div`
 `;
 
 const TimelineToolbarWrapper = styled.div`
-
-`;
-
-const TrackHeader = styled.div`
-  height: 100px;
-`;
-
-const TrackName = styled.h3`
 
 `;
 
@@ -107,6 +100,7 @@ class Timeline extends Component {
     songLength: 0,
     percentageComplete: 0,
     tracks: [],
+    rendering: false,
   }
 
   bpmTimeline;
@@ -146,7 +140,7 @@ class Timeline extends Component {
 
   render() {
 
-    const { song, bars } = this.props;
+    const { song, bars, connectDropTarget } = this.props;
     const {
       scale,
       currentTool,
@@ -176,10 +170,7 @@ class Timeline extends Component {
 
     const TrackHeaders = tracks.map((track, index) => {
       return (
-        <TrackHeader key={index}>
-          <TrackName>Untitled Track {index + 1}</TrackName>
-          <Button icon>volume_off</Button>
-        </TrackHeader>
+        <TrackHeader track={track}></TrackHeader>
       )
     });
 
@@ -190,6 +181,7 @@ class Timeline extends Component {
           bar={index}
           barWidth={barWidth}
           onClick={(e) => this.handleLegendClick(index)}
+          key={index}
         >{index}</TimelineLabel>
       );
     });

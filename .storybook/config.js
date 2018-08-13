@@ -8,7 +8,8 @@ function loadStories() {
   require('../src/components/Timeline/Marker.story.js');
   require('../src/components/Timeline/Track.story.js');
   require('../src/components/Timeline/Timeline.story.js');
-  require('../src/components/Library.story.js');
+  require('../src/components/Library/Library.story.js');
+  require('../src/components/Library/Loop.story.js');
   require('../src/components/Editor.story.js');
 }
 

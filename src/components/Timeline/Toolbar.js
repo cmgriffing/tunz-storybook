@@ -125,7 +125,11 @@ class TimelineToolbar extends Component {
         return undefined;
       }
       return (
-        <Button icon onClick={(e) => this.handleControlClick(control)}>{control.iconName}</Button>
+        <Button
+          icon
+          onClick={(e) => this.handleControlClick(control)}
+          key={index}
+        >{control.iconName}</Button>
       );
     });
 
